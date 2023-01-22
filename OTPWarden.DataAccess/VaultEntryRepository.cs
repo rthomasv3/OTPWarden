@@ -64,6 +64,7 @@ public sealed class VaultEntryRepository : IVaultEntryRepository
             Algorithm = algorithm,
             Counter = counter,
             Digits = digits,
+            Name = name,
             Notes = encryptedNotes,
             SecretKey = encryptedSecretKey,
             UserId = userId,

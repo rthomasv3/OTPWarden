@@ -1,6 +1,6 @@
 ﻿namespace OTPWarden.Controllers.V1.Contract.Responses;
 
-public sealed class CreateVaultEntryApiResponse
+public sealed class CreateVaultEntryApiResponse : ApiResponse
 {
-    public long Id { get; set; }
+    public VaultEntryContent VaultEntry { get; init; }
 }

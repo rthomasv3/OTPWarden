@@ -1,0 +1,139 @@
+﻿@using OTPWarden.Controllers.V1.Contract.Requests;
+@using OTPWarden.Controllers.V1.Contract.Responses;
+@using OTPWarden.UIServices.Abstractions;
+@using System.Text.Json;
+@using System.Text;
+
+@inject AppSettings _appSettings
+@inject IOAuthHttpService _oauthHttpService
+
+<fieldset disabled="@_isLoading">
+    <div class=@ModalClass>
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Vault Entry</p>
+                <button class="delete" aria-label="close" @onclick=CloseModal></button>
+            </header>
+
+            <section class="modal-card-body">
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Name" @bind-value="_name">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Authenticator Key" @bind-value="_key">
+                    </div>
+                </div>
+
+                @for (int i = 0; i < _urls.Count; ++i)
+                {
+                    int index = i;
+
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            <input class="input" type="text" placeholder="URL" @bind-value="_urls[index]">
+                        </p>
+                        <p class="control">
+                            <button class="delete mt-2 has-background-danger" aria-label="close" @onclick="(() => RemoveUrl(index))"></button>
+                        </p>
+                    </div>
+                }
+
+                <div class="field">
+                    <div class="buttons is-right">
+                        <button class="button" @onclick=AddUrl>Add URL</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <textarea class="textarea" placeholder="Notes" @bind="_notes"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="modal-card-foot is-justify-content-flex-end">
+                <a class="@SaveButtonClass" @onclick=SaveVaultEntry>Save changes</a>
+                <a class="button" @onclick=CloseModal>Cancel</a>
+            </footer>
+        </div>
+    </div>
+</fieldset>
+
+@code {
+    private bool _isLoading;
+    private string _name;
+    private string _key;
+    private string _notes;
+    private List<string> _urls = new List<string>() { String.Empty };
+
+    private string SaveButtonClass => _isLoading ? "button is-success is-loading" : "button is-success";
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsActiveChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<VaultEntryContent> VaultEntryCreated { get; set; }
+
+    public string ModalClass => IsActive ? "modal is-active" : "modal";
+
+    private void CloseModal()
+    {
+        IsActive = false;
+        _name = null;
+        _key = null;
+        _notes = null;
+        _urls = new List<string>() { String.Empty };
+    }
+
+    private async Task SaveVaultEntry()
+    {
+        _isLoading = true;
+
+        CreateVaultEntryApiRequest request = new CreateVaultEntryApiRequest()
+        {
+            Algorithm = null,
+            Counter = null,
+            Digits = null,
+            Issuer = null,
+            Name = _name,
+            Notes = _notes,
+            Period = null,
+            SecretKey = _key,
+            Urls = _urls
+        };
+        CreateVaultEntryApiResponse createVaultEntryResponse = await _oauthHttpService
+            .PostAsync<CreateVaultEntryApiResponse>($"{_appSettings.Host}/api/v1/vault/create-entry",
+                                                    new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+
+        if (createVaultEntryResponse != null)
+        {
+            await VaultEntryCreated.InvokeAsync(createVaultEntryResponse.VaultEntry);
+            CloseModal();
+        }
+        else
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void AddUrl()
+    {
+        _urls.Add(String.Empty);
+    }
+
+    private void RemoveUrl(int index)
+    {
+        if (index < _urls.Count)
+        {
+            _urls.RemoveAt(index);
+        }
+    }
+}

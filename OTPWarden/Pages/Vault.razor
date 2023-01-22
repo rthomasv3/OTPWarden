@@ -4,50 +4,56 @@
 
 @inject AppSettings _appSettings
 @inject IOAuthHttpService _oauthHttpService
-@inject ProtectedLocalStorage _protectedLocalStorage
 
 @page "/vault"
 
 <PageTitle>Vault</PageTitle>
 
-<div class="columns is-vcentered is-gapless is-mobile">
-    <div class="column is-narrow">
-        <h1 class="title mr-1">Vault</h1>
-    </div>
-    <div class="column is-narrow">
-        <button class="button is-white is-rounded has-text-info is-small mt-1">
-            <span class="icon is-small">
-                <i class="fa-solid fa-plus"></i>
-            </span>
-        </button>
+<div class="field mb-0">
+    <div class="field-body is-flex is-flex-direction-row">
+        <div class="field is-narrow mr-0">
+            <p class="control">
+                <h1 class="title">Vault</h1>
+            </p>
+        </div>
+
+        <div class="field is-narrow ml-0">
+            <p class="control">
+                <button class="button is-white is-rounded has-text-info is-small mt-1" @onclick=ShowVaultEntryCreationModal>
+                    <span class="icon">
+                        <i class="fa-solid fa-plus"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
     </div>
 </div>
 
-<div class="columns is-mobile is-gapless">
-    <div class="column is-11">
+<div class="field">
+    <div class="field-body is-flex is-flex-direction-row">
         <div class="field has-addons">
-            <div class="control is-expanded has-icons-left">
+            <p class="control is-expanded has-icons-left">
                 <input class="input" type="text" placeholder="Search your vault...">
                 <span class="icon is-small is-left">
                     <i class="fas fa-search"></i>
                 </span>
-            </div>
-            <div class="control">
+            </p>
+            <p class="control">
                 <a class="button is-info">
                     Search
                 </a>
-            </div>
+            </p>
         </div>
-    </div>
 
-    <div class="column is-1">
-        <p class="control">
-            <button class="button is-white">
-                <span class="icon is-small has-text-grey">
-                    <i class="fa-solid fa-filter"></i>
-                </span>
-            </button>
-        </p>
+        <div class="field is-narrow">
+            <p class="control">
+                <button class="button is-white">
+                    <span class="icon is-small has-text-grey">
+                        <i class="fa-solid fa-filter"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
     </div>
 </div>
 
@@ -69,12 +75,22 @@ else if (_vaultEntryContent.Count() == 0)
 }
 else
 {
-
+    <div class="mt-5">
+        @foreach (VaultEntryContent vaultEntry in _vaultEntryContent)
+        {
+            <div class="box mt-0 mb-2">
+                @vaultEntry.Name
+            </div>
+        }
+    </div>
 }
+
+<VaultEntryCreation @bind-IsActive=@_addVaultActive VaultEntryCreated="e => _vaultEntryContent.Add(e)" />
 
 @code {
     private bool _isLoading = false;
-    private IEnumerable<VaultEntryContent> _vaultEntryContent = new List<VaultEntryContent>();
+    private List<VaultEntryContent> _vaultEntryContent = new List<VaultEntryContent>();
+    private bool _addVaultActive = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,9 +100,14 @@ else
 
         if (getUserVaultResponse != null)
         {
-            _vaultEntryContent = getUserVaultResponse.VaultEntries;
+            _vaultEntryContent = getUserVaultResponse.VaultEntries.ToList();
         }
 
         _isLoading = false;
+    }
+
+    private void ShowVaultEntryCreationModal()
+    {
+        _addVaultActive = true;
     }
 }

@@ -64,10 +64,13 @@ public sealed class VaultController : ControllerBase
             VaultEntry vaultEntry = await _vaultService.CreateVaultEntry(userId, request.Name, request.SecretKey, request.Urls,
                 request.Algorithm, request.Counter, request.Digits, request.Notes);
 
-            response = Ok(new CreateVaultEntryApiResponse()
+            if (vaultEntry != null)
             {
-                Id = vaultEntry.Id
-            });
+                response = Ok(new CreateVaultEntryApiResponse()
+                {
+                    VaultEntry = MapVaultEntry(vaultEntry)
+                });
+            }
         }
 
         return response;
@@ -87,6 +90,7 @@ public sealed class VaultController : ControllerBase
             Digits = vaultEntry.Digits,
             Id = vaultEntry.Id,
             Issuer = vaultEntry.Issuer,
+            Name = vaultEntry.Name,
             Notes = vaultEntry.Notes,
             Period = vaultEntry.Period,
             SecretKey = vaultEntry.SecretKey,

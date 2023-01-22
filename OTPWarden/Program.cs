@@ -74,11 +74,13 @@ public class Program
         string databaseConnection = configuration.GetConnectionString("DatabaseConnection") ?? String.Empty;
         string host = configuration.GetValue<string>("Host");
         string jwtKey = configuration.GetValue<string>("JwtKey");
+        bool allowRegistration = configuration.GetValue<bool>("AllowRegistration");
 
         AppSettings appSettings = new AppSettings()
         {
             Host = host,
-            JwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            JwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            AllowRegistration = allowRegistration
         };
 
         services.AddRazorPages();

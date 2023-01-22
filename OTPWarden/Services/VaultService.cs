@@ -68,10 +68,10 @@ public sealed class VaultService : IVaultService
 
         if (notes != null)
         {
-            encryptedNotes = _cryptographyService.Encrypt(userEncryptionKey, notes);
+            encryptedNotes = _cryptographyService.Encrypt(notes, userEncryptionKey);
         }
 
-        VaultEntryData vaultEntryData = await _vaultEntryRepository.CreateVaultEntry(userId, name, encryptedSecretKey, 
+        VaultEntryData vaultEntryData = await _vaultEntryRepository.CreateVaultEntry(userId, name, encryptedSecretKey,
             encryptedUrls, algorithm, counter, digits, encryptedNotes);
 
         return DecryptVaultEntry(vaultEntryData);
@@ -96,7 +96,7 @@ public sealed class VaultService : IVaultService
         {
             if (!String.IsNullOrEmpty(vaultEntryUrlData.Url))
             {
-                urls.Add(_cryptographyService.Decrypt(secretKey, vaultEntryUrlData.Url));
+                urls.Add(_cryptographyService.Decrypt(vaultEntryUrlData.Url, userDataDecryptionKey));
             }
         }
 
@@ -108,6 +108,7 @@ public sealed class VaultService : IVaultService
             Digits = vaultEntryData.Digits,
             Id = vaultEntryData.Id,
             Issuer = vaultEntryData.Issuer,
+            Name = vaultEntryData.Name,
             Notes = notes,
             Period = vaultEntryData.Period,
             SecretKey = secretKey,

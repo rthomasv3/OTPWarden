@@ -68,13 +68,16 @@ public sealed class AuthService : IAuthService
     {
         AuthenticateUserResult authenticateUserResult = null;
 
-        if (MailAddress.TryCreate(email, out MailAddress _) && !String.IsNullOrWhiteSpace(password))
+        if (_appSettings.AllowRegistration)
         {
-            UserData user = await _userService.CreateUser(email, password);
-
-            if (user != null)
+            if (MailAddress.TryCreate(email, out MailAddress _) && !String.IsNullOrWhiteSpace(password))
             {
-                authenticateUserResult = await Login(email, password, userDevice, userIpAddress);
+                UserData user = await _userService.CreateUser(email, password);
+
+                if (user != null)
+                {
+                    authenticateUserResult = await Login(email, password, userDevice, userIpAddress);
+                }
             }
         }
 
