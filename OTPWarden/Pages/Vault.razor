@@ -1,11 +1,12 @@
-﻿@page "/vault"
-
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using OTPWarden.Controllers.V1.Contract.Responses
 @using OTPWarden.UIServices.Abstractions;
+
 @inject AppSettings _appSettings
 @inject IOAuthHttpService _oauthHttpService
 @inject ProtectedLocalStorage _protectedLocalStorage
+
+@page "/vault"
 
 <PageTitle>Vault</PageTitle>
 

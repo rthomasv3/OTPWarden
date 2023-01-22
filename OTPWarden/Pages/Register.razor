@@ -1,19 +1,20 @@
-﻿@page "/register"
-
-<PageTitle>Register</PageTitle>
-
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using OTPWarden.Controllers.V1.Contract.Requests;
 @using OTPWarden.Controllers.V1.Contract.Responses;
 @using OTPWarden.Services.Abstractions;
 @using OTPWarden.Models;
 @using System.Text.Json;
 @using System.Net.Http.Json;
+
 @inject ProtectedLocalStorage _protectedLocalStorage
 @inject NavigationManager _navigationManager
 @inject HttpClient _httpClient
 @inject AppSettings _appSettings
 @inject IJSRuntime _jsRuntime
+
+@page "/register"
+
+<PageTitle>Register</PageTitle>
 
 <h1 class="title">Register</h1>
 

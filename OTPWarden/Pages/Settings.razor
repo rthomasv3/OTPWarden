@@ -1,9 +1,9 @@
-﻿@page "/settings"
+﻿@inject HttpClient _httpClient
+@inject AppSettings _appSettings
+
+@page "/settings"
 
 <PageTitle>Settings</PageTitle>
-
-@inject HttpClient _httpClient
-@inject AppSettings _appSettings
 
 <h1 class="title">Settings</h1>
 
