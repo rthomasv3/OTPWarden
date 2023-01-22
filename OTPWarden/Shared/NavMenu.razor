@@ -1,0 +1,108 @@
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using System.Net.Http.Headers;
+@using OTPWarden.Controllers.V1.Contract.Responses;
+@using OTPWarden.UIServices.Abstractions;
+@inject ProtectedLocalStorage _protectedLocalStorage
+@inject HttpClient _httpClient
+@inject AppSettings _appSettings
+@inject NavigationManager _navigationManager
+@inject IOAuthHttpService _oauthHttpService
+
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/" @onclick="CloseNavMenu">
+            <span class="icon-text">
+                <span class="icon has-text-link">
+                    <i class="fa-regular fa-clock fa-lg"></i>
+                </span>
+                <span>OTPWarden</span>
+            </span>
+        </a>
+
+        <a role="button" class="@NavbarBurgerClass" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" @onclick="ToggleNavMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="@NavbarMenuClass">
+        <div class="navbar-start">
+            <a class="navbar-item" href="vault" @onclick="CloseNavMenu">
+                Vault
+            </a>
+
+            <a class="navbar-item" href="settings" @onclick="CloseNavMenu">
+                Settings
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    @if (_isLoggedIn)
+                    {
+                        <a class="button is-light" role="button" @onclick="Logout">
+                            Logout
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="button is-success" href="/register" @onclick="CloseNavMenu">
+                            <strong>Sign up</strong>
+                        </a>
+
+                        <a class="button is-light" href="/login" @onclick="CloseNavMenu">
+                            Log in
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private bool _collapseNavMenu = true;
+    private bool _isLoggedIn = false;
+
+    private string NavbarBurgerClass => _collapseNavMenu ? "navbar-burger" : "navbar-burger is-active";
+    private string NavbarMenuClass => _collapseNavMenu ? "navbar-menu" : "navbar-menu is-active";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        ProtectedBrowserStorageResult<string> accessTokenStorageResult = await _protectedLocalStorage.GetAsync<string>("AccessToken");
+
+        if (accessTokenStorageResult.Success && !_isLoggedIn)
+        {
+            _isLoggedIn = true;
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void CloseNavMenu()
+    {
+        _collapseNavMenu = true;
+    }
+
+    private void ToggleNavMenu()
+    {
+        _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    private async Task Logout()
+    {
+        UserLogoutApiResponse response = await _oauthHttpService.PostAsync<UserLogoutApiResponse>($"{_appSettings.Host}/api/v1/auth/logout", null);
+
+        if (response.LoggedOutSuccessfully)
+        {
+            await _protectedLocalStorage.DeleteAsync("AccessToken");
+            await _protectedLocalStorage.DeleteAsync("RefreshToken");
+            _isLoggedIn = false;
+
+            _navigationManager.NavigateTo("/login", true);
+        }
+    }
+}

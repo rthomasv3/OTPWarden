@@ -1,0 +1,91 @@
+﻿@page "/vault"
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using OTPWarden.Controllers.V1.Contract.Responses
+@using OTPWarden.UIServices.Abstractions;
+@inject AppSettings _appSettings
+@inject IOAuthHttpService _oauthHttpService
+@inject ProtectedLocalStorage _protectedLocalStorage
+
+<PageTitle>Vault</PageTitle>
+
+<div class="columns is-vcentered is-gapless is-mobile">
+    <div class="column is-narrow">
+        <h1 class="title mr-1">Vault</h1>
+    </div>
+    <div class="column is-narrow">
+        <button class="button is-white is-rounded has-text-info is-small mt-1">
+            <span class="icon is-small">
+                <i class="fa-solid fa-plus"></i>
+            </span>
+        </button>
+    </div>
+</div>
+
+<div class="columns is-mobile is-gapless">
+    <div class="column is-11">
+        <div class="field has-addons">
+            <div class="control is-expanded has-icons-left">
+                <input class="input" type="text" placeholder="Search your vault...">
+                <span class="icon is-small is-left">
+                    <i class="fas fa-search"></i>
+                </span>
+            </div>
+            <div class="control">
+                <a class="button is-info">
+                    Search
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="column is-1">
+        <p class="control">
+            <button class="button is-white">
+                <span class="icon is-small has-text-grey">
+                    <i class="fa-solid fa-filter"></i>
+                </span>
+            </button>
+        </p>
+    </div>
+</div>
+
+@if (_isLoading)
+{
+    <section class="hero is-medium">
+        <div class="hero-body">
+            <p class="has-text-centered">
+                <span class="icon is-large">
+                    <i class="fa-solid fa-spinner fa-2x fa-pulse"></i>
+                </span>
+            </p>
+        </div>
+    </section>
+}
+else if (_vaultEntryContent.Count() == 0)
+{
+    <p class="has-text-centered has-text-grey py-6">Empty Vault</p>
+}
+else
+{
+
+}
+
+@code {
+    private bool _isLoading = false;
+    private IEnumerable<VaultEntryContent> _vaultEntryContent = new List<VaultEntryContent>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        GetUserVaultApiResponse getUserVaultResponse = await _oauthHttpService.GetAsync<GetUserVaultApiResponse>($"{_appSettings.Host}/api/v1/vault");
+
+        if (getUserVaultResponse != null)
+        {
+            _vaultEntryContent = getUserVaultResponse.VaultEntries;
+        }
+
+        _isLoading = false;
+    }
+}
