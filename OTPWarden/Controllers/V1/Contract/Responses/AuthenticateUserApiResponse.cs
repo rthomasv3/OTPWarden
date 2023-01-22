@@ -2,7 +2,7 @@
 
 namespace OTPWarden.Controllers.V1.Contract.Responses;
 
-public sealed class AuthenticateUserApiResponse
+public sealed class AuthenticateUserApiResponse : ApiResponse
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; init; }

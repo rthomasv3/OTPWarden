@@ -2,5 +2,5 @@
 
 public class ApiResponse
 {
-
+    public string Message { get; init; }
 }

@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -41,6 +43,11 @@ public sealed class OAuthHttpService : IOAuthHttpService
     #endregion
 
     #region Public Methods
+
+    public async Task<U> PostAsync<T, U>(string requestUri, T content)
+    {
+        return await PostAsync<U>(requestUri, new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json"));
+    }
 
     public async Task<T> PostAsync<T>(string requestUri, HttpContent content)
     {

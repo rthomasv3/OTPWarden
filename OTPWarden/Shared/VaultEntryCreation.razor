@@ -110,8 +110,7 @@
             Urls = _urls
         };
         CreateVaultEntryApiResponse createVaultEntryResponse = await _oauthHttpService
-            .PostAsync<CreateVaultEntryApiResponse>($"{_appSettings.Host}/api/v1/vault/create-entry",
-                                                    new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"));
+            .PostAsync<CreateVaultEntryApiRequest, CreateVaultEntryApiResponse>($"{_appSettings.Host}/api/v1/vault/create-entry", request);
 
         if (createVaultEntryResponse != null)
         {
