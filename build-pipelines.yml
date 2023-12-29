@@ -4,13 +4,9 @@ trigger:
 pool: Self-hosted
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
@@ -20,3 +16,4 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
+    arguments: '-c $(buildConfiguration) --no-restore'
